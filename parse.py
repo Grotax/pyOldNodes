@@ -29,8 +29,12 @@ def main():
             table = AsciiTable(table_data)
             print(table.table)
         else:
-            for i in table_data:
-                print(i)
+            maxlengths = [max([len(row[col]) for row in table_data]) for col in range(3)]
+            for row in table_data:
+                print("{} | {} | {}".format(
+                    row[0].ljust(maxlengths[0]),
+                    row[1].ljust(maxlengths[1]),
+                    row[2].ljust(maxlengths[2])))
             print("für bessere Tabellen: pip install terminaltables")
 
 
