@@ -2,6 +2,7 @@
 """Durchsucht die lokale nodes.json auf alte Knoten mit einer Firmware aus 2016"""
 
 import json
+
 try:
     from terminaltables import AsciiTable
     USE_TABLE = True
@@ -14,20 +15,35 @@ def main():
         data = json.load(file)
         try:
             nodes = data['nodes']
+            node_info = True
         except KeyError:
-            nodes = json.load(file)
+            nodes = data
+            node_info = False
         table_data = [['Name', 'Kontakt', 'Firmware']]
-        for i in nodes:
-            if nodes[i]["nodeinfo"]["software"]["firmware"]["release"].startswith("2016"):
-                try:
-                    owner = nodes[i]['nodeinfo']['owner']['contact']
-                except KeyError:
-                    owner = "N/A"
-                table_data.append(
-                    [nodes[i]['nodeinfo']['hostname'],
-                     owner,
-                     nodes[i]["nodeinfo"]["software"]["firmware"]["release"]]
-                    )
+        if node_info:
+            for i in nodes:
+                if nodes[i]["nodeinfo"]["software"]["firmware"]["release"].startswith("2016"):
+                    try:
+                        owner = nodes[i]["nodeinfo"]['owner']['contact']
+                    except KeyError:
+                        owner = "N/A"
+                    table_data.append(
+                        [nodes[i]["nodeinfo"]['hostname'],
+                         owner,
+                         nodes[i]["nodeinfo"]["software"]["firmware"]["release"]]
+                        )
+        else:
+            for i in nodes:
+                if nodes[i]["software"]["firmware"]["release"].startswith("2016"):
+                    try:
+                        owner = nodes[i]['owner']['contact']
+                    except KeyError:
+                        owner = "N/A"
+                    table_data.append(
+                        [nodes[i]['hostname'],
+                         owner,
+                         nodes[i]["software"]["firmware"]["release"]]
+                        )
         if USE_TABLE:
             table = AsciiTable(table_data)
             print(table.table)
