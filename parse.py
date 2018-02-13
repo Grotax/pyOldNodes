@@ -12,18 +12,21 @@ def main():
     """the main function"""
     with open('nodes.json') as file:
         data = json.load(file)
-        nodes = data['nodes']
+        try:
+            nodes = data['nodes']
+        except KeyError:
+            nodes = json.load(file)
         table_data = [['Name', 'Kontakt', 'Firmware']]
         for i in nodes:
-            if data['nodes'][i]["nodeinfo"]["software"]["firmware"]["release"].startswith("2016"):
+            if nodes[i]["nodeinfo"]["software"]["firmware"]["release"].startswith("2016"):
                 try:
-                    owner = data['nodes'][i]['nodeinfo']['owner']['contact']
+                    owner = nodes[i]['nodeinfo']['owner']['contact']
                 except KeyError:
                     owner = "N/A"
                 table_data.append(
-                    [data['nodes'][i]['nodeinfo']['hostname'],
+                    [nodes[i]['nodeinfo']['hostname'],
                      owner,
-                     data['nodes'][i]["nodeinfo"]["software"]["firmware"]["release"]]
+                     nodes[i]["nodeinfo"]["software"]["firmware"]["release"]]
                     )
         if USE_TABLE:
             table = AsciiTable(table_data)
