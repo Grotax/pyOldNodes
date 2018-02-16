@@ -70,7 +70,7 @@ def main():
                         html_cell += "<th>{}</th>".format(cell)
                     html_row = "<tr>{}</tr>".format(html_cell)
                     html_content += html_row
-                html_table = '<table border=1 align="center">{}</table>'.format(html_content)
+                html_table = '<table border=1 id="nodestable" align="center">{}</table>'.format(html_content)
                 file.write(html_table)
     else:
         maxlengths = [max([len(row[col]) for row in table_data]) for col in range(3)]
