@@ -3,10 +3,13 @@
 
 import json
 import argparse
+import re
 
 PARSER = argparse.ArgumentParser()
 PARSER.add_argument("-j" "--json", metavar="Path", dest="json_path",
                     help="Path to the nodes.json file", required=True)
+PARSER.add_argument("-s" "--search", metavar="search", dest="search",
+                    help="pattern to search in firmware", required=True)
 PARSER.add_argument("--html", metavar="Path", dest="html_path", default=False,
                     help="Path where to store HTML output")
 
@@ -28,35 +31,25 @@ def main():
         data = json.load(file)
     try:
         nodes = data['nodes']
-        node_info = True
     except KeyError:
-        nodes = data
-        node_info = False
+        print("fehler")
+
     table_data = [['Name', 'Kontakt', 'Firmware']]
-    if node_info:
-        for i in nodes:
-            if nodes[i]["nodeinfo"]["software"]["firmware"]["release"].startswith("2016"):
+    for node in nodes:
+        try:
+            if re.search(ARGS.search, node["nodeinfo"]["software"]["firmware"]["release"]) is not None:
                 try:
-                    owner = nodes[i]["nodeinfo"]['owner']['contact']
-                except KeyError:
+                    owner = node["nodeinfo"]['owner']['contact']
+                except TypeError:
                     owner = "N/A"
                 table_data.append(
-                    [nodes[i]["nodeinfo"]['hostname'],
+                    [node["nodeinfo"]['hostname'],
                      owner,
-                     nodes[i]["nodeinfo"]["software"]["firmware"]["release"]]
-                    )
-    else:
-        for i in nodes:
-            if nodes[i]["software"]["firmware"]["release"].startswith("2016"):
-                try:
-                    owner = nodes[i]['owner']['contact']
-                except KeyError:
-                    owner = "N/A"
-                table_data.append(
-                    [nodes[i]['hostname'],
-                     owner,
-                     nodes[i]["software"]["firmware"]["release"]]
-                    )
+                     node["nodeinfo"]["software"]["firmware"]["release"]]
+                )
+        except KeyError:
+            pass
+
     if USE_TABLE:
         table = AsciiTable(table_data)
         print(table.table)
